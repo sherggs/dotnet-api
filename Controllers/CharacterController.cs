@@ -4,28 +4,42 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
+using static System.Console;
+
 namespace Net7.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class CharacterController : ControllerBase
     {
-        private static List<Character> characters = new List<Character> {
-            new Character(),
-            new Character { Id = 1, Name = "Mason", Class = RpgClass.Knight, HitPoints = 70}
-        };
+        
+        private readonly ICharacterService _characterService;
+
+        public CharacterController(ICharacterService characterService)
+        {
+            _characterService = characterService;
+        }
+
 
        [HttpGet("GetAll")]
-       public ActionResult<List<Character>> Get()
+       public async Task<ActionResult<List<Character>>> Get()
        {
-           return Ok(characters);
+           return Ok(await _characterService.GetAllCharacters());
        }
 
        [HttpGet("{id}")]
-       public ActionResult<Character> GetSingle(int id)
+       public async Task<ActionResult<Character>> GetSingle(int id)
        {
-           return Ok(characters.FirstOrDefault(c => c.Id == id));
-       }              
+           return Ok(await _characterService.GetCharacterById(id));
+       }             
 
+         [HttpPost]
+       public  async Task<ActionResult<List<Character>>> AddCharacter(Character newCharacter)
+       {
+           
+           WriteLine("Character added!");
+           return Ok(await _characterService.AddCharacter(newCharacter));
+           
+       }
     }
 }
