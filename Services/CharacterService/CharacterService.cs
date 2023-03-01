@@ -12,26 +12,29 @@ namespace Net7.Services.CharacterService
             new Character(),
             new Character { Id = 1, Name = "Mason", Class = RpgClass.Knight, HitPoints = 70}
         };
-        public async Task<List<Character>> AddCharacter(Character newCharacter)
+        public async Task<ServiceResponse<List<GetCharacterDtos>>> AddCharacter(AddCharacterDtos newCharacter)
         {
-            
-           characters.Add(newCharacter);
-           WriteLine("Character added!");
-           return (characters);
+            var serviceResponse = new ServiceResponse<List<Character>>();
+            characters.Add(newCharacter);
+            serviceResponse.Data = characters;
+            WriteLine("Character added!");
+            return serviceResponse;
            
         }
 
-        public async Task<List<Character>> GetAllCharacters()
+        public async Task<ServiceResponse<List<GetCharacterDtos>>> GetAllCharacters()
         {
-              return characters;
+            var serviceResponse = new ServiceResponse<List<Character>>();
+            serviceResponse.Data = characters;
+            return serviceResponse; 
         }
 
-        public async Task<Character> GetCharacterById(int id)
+        public async Task<ServiceResponse<GetCharacterDtos>> GetCharacterById(int id)
         {
+            var serviceResponse = new ServiceResponse<Character>();
             var character = characters.FirstOrDefault(c => c.Id == id);
-            if(character is not null)
-            return character;
-            throw new Exception("Character not found");
+            serviceResponse.Data = character;
+            return serviceResponse;
         }  
     }
 }
