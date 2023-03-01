@@ -7,9 +7,9 @@ namespace Net7.Services.CharacterService
 {
     public interface ICharacterService
     {
-        Task<List<Character>> GetAllCharacters();
-        Task<Character> GetCharacterById(int id);
-        Task<List<Character>> AddCharacter(Character newCharacter);        
+        Task<ServiceResponse<List<GetCharacterDtos>>> GetAllCharacters();
+        Task<ServiceResponse<GetCharacterDtos>> GetCharacterById(int id);
+        Task<ServiceResponse<List<GetCharacterDtos>>> AddCharacter(AddCharacterDtos newCharacter);        
 
     }
 }
