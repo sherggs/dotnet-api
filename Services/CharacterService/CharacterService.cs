@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using static System.Console;
 
 namespace Net7.Services.CharacterService
@@ -12,28 +13,34 @@ namespace Net7.Services.CharacterService
             new Character(),
             new Character { Id = 1, Name = "Mason", Class = RpgClass.Knight, HitPoints = 70}
         };
+        private readonly IMapper _mapper;
+        public CharacterService(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
         public async Task<ServiceResponse<List<GetCharacterDtos>>> AddCharacter(AddCharacterDtos newCharacter)
         {
-            var serviceResponse = new ServiceResponse<List<Character>>();
-            characters.Add(newCharacter);
-            serviceResponse.Data = characters;
-            WriteLine("Character added!");
+            var serviceResponse = new ServiceResponse<List<GetCharacterDtos>>();
+            characters.Add(_mapper.Map<Character>(newCharacter));
+            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDtos>(c)).ToList();
             return serviceResponse;
            
         }
 
+
         public async Task<ServiceResponse<List<GetCharacterDtos>>> GetAllCharacters()
         {
-            var serviceResponse = new ServiceResponse<List<Character>>();
-            serviceResponse.Data = characters;
+            var serviceResponse = new ServiceResponse<List<GetCharacterDtos>>();
+            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDtos>(c)).ToList();
             return serviceResponse; 
         }
 
         public async Task<ServiceResponse<GetCharacterDtos>> GetCharacterById(int id)
         {
-            var serviceResponse = new ServiceResponse<Character>();
+            var serviceResponse = new ServiceResponse<GetCharacterDtos>();
             var character = characters.FirstOrDefault(c => c.Id == id);
-            serviceResponse.Data = character;
+            serviceResponse.Data = _mapper.Map<GetCharacterDtos>(character);
             return serviceResponse;
         }  
     }
