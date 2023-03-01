@@ -1,6 +1,7 @@
 global using Net7.Models;
 global using Net7.Services.CharacterService;
 global using Net7.Dtos.Character;
+global using AutoMapper;
 
 
 var builder = WebApplication.CreateBuilder(args);
