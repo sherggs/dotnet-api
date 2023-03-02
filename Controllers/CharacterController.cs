@@ -45,9 +45,12 @@ namespace Net7.Controllers
         [HttpPut]
        public  async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> UpdateCharacter(UpdateCharacterDtos updatedCharacter)
        {
-           
-           WriteLine("Character added!");
-           return Ok(await _characterService.UpdateCharacter(updatedCharacter));
+           var response = await _characterService.UpdateCharacter(updatedCharacter);
+              if(response.Data is null)
+              {
+                return NotFound(response);
+              }
+           return Ok(response);
            
        }
     }
