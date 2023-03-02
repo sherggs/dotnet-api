@@ -12,6 +12,7 @@ namespace Net7
         {
             CreateMap<Character, GetCharacterDtos>();
             CreateMap<AddCharacterDtos, Character>();
+            CreateMap<UpdateCharacterDtos, Character>();
         }
     }
 }
