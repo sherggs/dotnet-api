@@ -41,6 +41,14 @@ namespace Net7.Controllers
            return Ok(await _characterService.AddCharacter(newCharacter));
            
        }
-     
+
+        [HttpPut]
+       public  async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> UpdateCharacter(UpdateCharacterDtos updatedCharacter)
+       {
+           
+           WriteLine("Character added!");
+           return Ok(await _characterService.UpdateCharacter(updatedCharacter));
+           
+       }
     }
-}
+} 
