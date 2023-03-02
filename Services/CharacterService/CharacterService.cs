@@ -52,6 +52,11 @@ namespace Net7.Services.CharacterService
             try
             {
                 var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+                if(character is null) 
+                throw new Exception($"Character with id '{updatedCharacter.Id}'not found.");
+
+                _mapper.Map(updatedCharacter, character);
+    
                 character.Name = updatedCharacter.Name;
                 character.Class = updatedCharacter.Class;
                 character.Defense = updatedCharacter.Defense;
