@@ -22,7 +22,10 @@ namespace Net7.Services.CharacterService
         public async Task<ServiceResponse<List<GetCharacterDtos>>> AddCharacter(AddCharacterDtos newCharacter)
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDtos>>();
-            characters.Add(_mapper.Map<Character>(newCharacter));
+            var character = _mapper.Map<Character>(newCharacter);
+            character.Id = characters.Max(c => c.Id) + 1;
+            character.HitPoints = 100;
+            characters.Add(character);
             serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDtos>(c)).ToList();
             return serviceResponse;
            
@@ -42,6 +45,28 @@ namespace Net7.Services.CharacterService
             var character = characters.FirstOrDefault(c => c.Id == id);
             serviceResponse.Data = _mapper.Map<GetCharacterDtos>(character);
             return serviceResponse;
-        }  
+        } 
+        public async Task<ServiceResponse<GetCharacterDtos>> UpdateCharacter(UpdateCharacterDtos updatedCharacter)
+        {
+            var serviceResponse = new ServiceResponse<GetCharacterDtos>();
+            try
+            {
+                var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+                character.Name = updatedCharacter.Name;
+                character.Class = updatedCharacter.Class;
+                character.Defense = updatedCharacter.Defense;
+                character.HitPoints = updatedCharacter.HitPoints;
+                character.Intelligence = updatedCharacter.Intelligence;
+                character.Strength = updatedCharacter.Strength;
+                serviceResponse.Data = _mapper.Map<GetCharacterDtos>(character);
+            }
+            catch (Exception ex)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = ex.Message;
+            }
+            return serviceResponse;
+        }
+    
     }
 }
