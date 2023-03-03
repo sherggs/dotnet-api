@@ -10,7 +10,9 @@ namespace Net7.Services.CharacterService
         Task<ServiceResponse<List<GetCharacterDtos>>> GetAllCharacters();
         Task<ServiceResponse<GetCharacterDtos>> GetCharacterById(int id);
         Task<ServiceResponse<List<GetCharacterDtos>>> AddCharacter(AddCharacterDtos newCharacter);        
-        Task<ServiceResponse<GetCharacterDtos>> UpdateCharacter(UpdateCharacterDtos updatedCharacter);        
+        Task<ServiceResponse<GetCharacterDtos>> UpdateCharacter(UpdateCharacterDtos updatedCharacter);    
+
+        Task<ServiceResponse<List<GetCharacterDtos>>> DeleteCharacter(int id);    
 
     }
 }
