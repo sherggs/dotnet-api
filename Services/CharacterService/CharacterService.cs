@@ -9,11 +9,7 @@ namespace Net7.Services.CharacterService
 {
     public class CharacterService : ICharacterService
     {  
-         private static List<Character> characters = new List<Character> {
-            new Character(),
-            new Character { Id = 1, Name = "Mason", Class = RpgClass.Knight, HitPoints = 70},
-            new Character { Id = 2, Name = "Ademola", Class = RpgClass.Mage, HitPoints = 100}
-        };
+         
         private readonly IMapper _mapper;
         private readonly DataContext _context;
         public CharacterService(IMapper mapper, DataContext context)
@@ -24,8 +20,8 @@ namespace Net7.Services.CharacterService
         public async Task<ServiceResponse<GetCharacterDtos>> GetCharacterById(int id) // Get a character by id
         {
             var serviceResponse = new ServiceResponse<GetCharacterDtos>();
-            var character = characters.FirstOrDefault(c => c.Id == id); // Get the character from the list
-            serviceResponse.Data = _mapper.Map<GetCharacterDtos>(character);
+            var dbCharacter = await _context.Characters.FirstOrDefaultAsync(c => c.Id == id); // Get the character from the list
+            serviceResponse.Data = _mapper.Map<GetCharacterDtos>(dbCharacter);
             return serviceResponse;
         } 
             public async Task<ServiceResponse<List<GetCharacterDtos>>> GetAllCharacters()
@@ -39,10 +35,9 @@ namespace Net7.Services.CharacterService
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDtos>>();
             var character = _mapper.Map<Character>(newCharacter);
-            character.Id = characters.Max(c => c.Id) + 1;
-            character.HitPoints = 100;
-            characters.Add(character);
-            serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDtos>(c)).ToList();
+            _context.Characters.Add(character);
+            await _context.SaveChangesAsync();
+            serviceResponse.Data = await _context.Characters.Select(c => _mapper.Map<GetCharacterDtos>(c)).ToListAsync();
             return serviceResponse;
            
         }
@@ -51,11 +46,12 @@ namespace Net7.Services.CharacterService
             var serviceResponse = new ServiceResponse<GetCharacterDtos>();
             try
             {
-                var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+                var character = 
+                await _context.Characters.FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id); // Get the character from the database
                 if(character is null) 
                 throw new Exception($"Character with id '{updatedCharacter.Id}'not found.");
 
-                _mapper.Map(updatedCharacter, character);
+                _mapper.Map(updatedCharacter, character); // Map the updated character to the character in the database
     
                 character.Name = updatedCharacter.Name;
                 character.Class = updatedCharacter.Class;
@@ -63,6 +59,8 @@ namespace Net7.Services.CharacterService
                 character.HitPoints = updatedCharacter.HitPoints;
                 character.Intelligence = updatedCharacter.Intelligence;
                 character.Strength = updatedCharacter.Strength;
+
+                await _context.SaveChangesAsync(); // Save the changes to the database
                 serviceResponse.Data = _mapper.Map<GetCharacterDtos>(character);
             }
             catch (Exception ex)
@@ -75,12 +73,18 @@ namespace Net7.Services.CharacterService
 
         public async Task<ServiceResponse<List<GetCharacterDtos>>> DeleteCharacter(int id)
         {
-            var serviceResponse = new ServiceResponse<List<GetCharacterDtos>>();
+            var serviceResponse = new ServiceResponse<List<GetCharacterDtos>>(); // Create a new service response
             try
             {
-                Character character = characters.First(c => c.Id == id);
-                characters.Remove(character);
-                serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDtos>(c)).ToList();
+                var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == id);
+                if(character is null) 
+                throw new Exception($"Character with id '{id}'not found.");
+
+                _context.Characters.Remove(character); // Remove the character from the database
+                await _context.SaveChangesAsync(); // Save the changes to the database
+
+
+                serviceResponse.Data = await _context.Characters.Select(c => _mapper.Map<GetCharacterDtos>(c)).ToListAsync(); // Map the characters to a list of GetCharacterDtos
             }
             catch (Exception ex)
             {
