@@ -6,6 +6,7 @@ global using AutoMapper;
 global using Microsoft.EntityFrameworkCore;
 global using Net7.Data;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program).Assembly); // Add AutoMapper
 builder.Services.AddScoped<ICharacterService, CharacterService>(); // Add CharacterService
+builder.Services.AddScoped<IAuthRepository, AuthRepository>(); // Add AuthRepository
 
 var app = builder.Build();
 
