@@ -7,8 +7,9 @@ using Net7.Dtos.User;
 
 namespace Net7.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
+    // AuthController
+    [ApiController] // This is an API controller
+    [Route("[controller]")] // This is the route
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepo;
@@ -17,7 +18,7 @@ namespace Net7.Controllers
            _authRepo = authRepo;
             
         }
-
+        // Register
         [HttpPost("Register")]
         public async Task<ActionResult<ServiceResponse<int>>> Register(UserRegisterDtos request)
         {
@@ -29,6 +30,17 @@ namespace Net7.Controllers
             }
             return Ok(response);
         }
-        
+        // Login
+        [HttpPost("Login")]
+        public async Task<ActionResult<ServiceResponse<int>>> Login(UserLoginDtos request)
+        {
+            var response = await _authRepo.Login(request.Username, request.Password);
+               
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            } 
+            return Ok(response);
+        }
     }
 }
