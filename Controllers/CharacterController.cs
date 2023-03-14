@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using static System.Console;
 
 namespace Net7.Controllers
 {
-    [ApiController]
+    [Authorize] // Add Authorize attribute
+    [ApiController] // Add ApiController attribute
     [Route("api/[controller]")]
     public class CharacterController : ControllerBase
     {
@@ -21,13 +23,13 @@ namespace Net7.Controllers
         }
 
 
-       [HttpGet("GetAll")]
+       [HttpGet("GetAll")] 
        public async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> Get()
        {
            return Ok(await _characterService.GetAllCharacters());
        }
 
-       [HttpGet("{id}")]
+       [HttpGet("{id}")] 
        public async Task<ActionResult<ServiceResponse<GetCharacterDtos>>> GetSingle(int id)
        {
            return Ok(await _characterService.GetCharacterById(id));
