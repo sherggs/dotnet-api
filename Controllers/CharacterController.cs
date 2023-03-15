@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,12 +10,14 @@ using static System.Console;
 
 namespace Net7.Controllers
 {
-    [Authorize] // Add Authorize attribute
-    [ApiController] // Add ApiController attribute
+    // Add Authorize attribute
+    [Authorize] 
+     // Add ApiController attribute
+    [ApiController]
     [Route("api/[controller]")]
     public class CharacterController : ControllerBase
     {
-        
+
         private readonly ICharacterService _characterService;
 
         public CharacterController(ICharacterService characterService)
@@ -23,48 +26,49 @@ namespace Net7.Controllers
         }
 
 
-       [HttpGet("GetAll")] 
-       public async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> Get()
-       {
-           return Ok(await _characterService.GetAllCharacters());
-       }
+        [HttpGet("GetAll")]
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> Get()
+        {
+            int userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)!.Value);
+            return Ok(await _characterService.GetAllCharacters(userId));
+        }
 
-       [HttpGet("{id}")] 
-       public async Task<ActionResult<ServiceResponse<GetCharacterDtos>>> GetSingle(int id)
-       {
-           return Ok(await _characterService.GetCharacterById(id));
-       }             
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ServiceResponse<GetCharacterDtos>>> GetSingle(int id)
+        {
+            return Ok(await _characterService.GetCharacterById(id));
+        }
 
-         [HttpPost]
-       public  async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> AddCharacter(AddCharacterDtos newCharacter)
-       {
-           
-           WriteLine("Character added!");
-           return Ok(await _characterService.AddCharacter(newCharacter));
-           
-       }
+        [HttpPost]
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> AddCharacter(AddCharacterDtos newCharacter)
+        {
+
+            WriteLine("Character added!");
+            return Ok(await _characterService.AddCharacter(newCharacter));
+
+        }
 
         [HttpPut]
-       public  async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> UpdateCharacter(UpdateCharacterDtos updatedCharacter)
-       {
-           var response = await _characterService.UpdateCharacter(updatedCharacter);
-              if(response.Data is null)
-              {
-                return NotFound(response);
-              }
-           return Ok(response);
-           
-       }  
-       
-         [HttpDelete("{id}")]
-         public async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> DeleteCharacter(int id)
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> UpdateCharacter(UpdateCharacterDtos updatedCharacter)
+        {
+            var response = await _characterService.UpdateCharacter(updatedCharacter);
+            if (response.Data is null)
             {
-                var response = await _characterService.DeleteCharacter(id);
-                if(response.Data is null)
-                {
-                    return NotFound(response);
-                }
-                return Ok(response);
+                return NotFound(response);
             }
+            return Ok(response);
+
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ServiceResponse<List<GetCharacterDtos>>>> DeleteCharacter(int id)
+        {
+            var response = await _characterService.DeleteCharacter(id);
+            if (response.Data is null)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
     }
-} 
+}
