@@ -12,15 +12,15 @@ namespace Net7.Data
     // Interface for AuthRepository
     public class AuthRepository : IAuthRepository
     {
-         private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
         private readonly DataContext _context;
-       
+
 
         public AuthRepository(DataContext context, IConfiguration configuration)
         {
             _configuration = configuration;
-           _context = context;
-           
+            _context = context;
+
         }
         // Login
         public async Task<ServiceResponse<string>> Login(string username, string password)
@@ -40,7 +40,7 @@ namespace Net7.Data
             else
             {
                 response.Data = CreateToken(user);
-                
+
             }
             return response;
         }
@@ -49,7 +49,8 @@ namespace Net7.Data
         public async Task<ServiceResponse<int>> Register(User user, string password)
         {
             var Response = new ServiceResponse<int>();
-            if (await UserExists(user.Username)){
+            if (await UserExists(user.Username))
+            {
                 Response.Success = false;
                 Response.Message = "User already exists";
                 return Response;
@@ -58,10 +59,10 @@ namespace Net7.Data
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-            
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            
+
             Response.Data = user.Id;
             return Response;
         }
@@ -69,7 +70,7 @@ namespace Net7.Data
         //checking existence of username
         public async Task<bool> UserExists(string username)
         {
-            if (await _context.Users.AnyAsync(u => u.Username.ToLower().Equals(username.ToLower()))) 
+            if (await _context.Users.AnyAsync(u => u.Username.ToLower().Equals(username.ToLower())))
             {
                 return true;
             }
@@ -84,8 +85,8 @@ namespace Net7.Data
                 passwordSalt = hmac.Key; // Key is a property of HMACSHA256
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password)); // ComputeHash is a method of HMACSHA256
             }
-            
-          
+
+
         }
         private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
@@ -105,12 +106,12 @@ namespace Net7.Data
             };
 
             var appSettingsToken = _configuration.GetSection("AppSettings:Token").Value;
-            if(appSettingsToken is null)
-            
+            if (appSettingsToken is null)
+
                 throw new Exception("AppSettings:Token is null");
-            
-           var key = new SymmetricSecurityKey(Encoding.UTF8
-            .GetBytes(appSettingsToken));
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8
+             .GetBytes(appSettingsToken));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -124,6 +125,6 @@ namespace Net7.Data
             return tokenHandler.WriteToken(token);
         }
 
-    
+
     }
 }
